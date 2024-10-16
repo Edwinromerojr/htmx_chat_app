@@ -27,12 +27,10 @@ class ChatroomConsumer(WebsocketConsumer):
         async_to_sync(self.channel_layer.group_discard)(
             self.chatroom_name, self.channel_name
         )
-
         # remove and update online users
         if self.user in self.chatroom.users_online.all():
             self.chatroom.users_online.remove(self.user)
             self.update_online_count()
-
 
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
@@ -43,16 +41,13 @@ class ChatroomConsumer(WebsocketConsumer):
             author = self.user,
             group = self.chatroom
         )
-
         event = {
             'type': 'message_handler',
             'message_id': message.id,
         }
-
         async_to_sync(self.channel_layer.group_send)(
             self.chatroom_name, event
         )
-
 
     def message_handler(self, event):
         message_id = event['message_id']
@@ -74,7 +69,6 @@ class ChatroomConsumer(WebsocketConsumer):
             'online_count': online_count
         }
         async_to_sync(self.channel_layer.group_send)(self.chatroom_name, event)
-
 
     def online_count_handler(self, event):
         online_count = event['online_count']
